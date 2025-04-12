@@ -7,5 +7,7 @@ export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Get('nearby/:cep')
-  async findNearbyStores(@Param() params: CepValidationDto) {}
+  async findNearbyStores(@Param() params: CepValidationDto) {
+    return await this.storesService.listNearbyStoresByCep(params.cep);
+  }
 }
