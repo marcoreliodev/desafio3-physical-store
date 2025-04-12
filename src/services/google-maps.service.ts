@@ -5,7 +5,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Coordinates, GeocodeData, ViaCepData } from '../types';
+import {
+  Coordinates,
+  DistanceMatrixData,
+  GeocodeData,
+  TravelDistanceAndDuration,
+  ViaCepData,
+} from '../types';
 
 @Injectable()
 export class GoogleMapsService {
@@ -35,6 +41,38 @@ export class GoogleMapsService {
       return { lat: geo.lat, lng: geo.lng };
     } catch (error) {
       console.error('Erro no geocodeCep:', error?.response?.data || error);
+      throw new InternalServerErrorException(
+        'Erro ao consultar o Google Maps.',
+      );
+    }
+  }
+
+  async getDistanceMatrix(
+    origin: Coordinates,
+    destinations: Coordinates[],
+  ): Promise<TravelDistanceAndDuration[]> {
+    try {
+      const destinationsString = destinations
+        .map((d) => `${d.lat},${d.lng}`)
+        .join('|');
+
+      const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.lat},${origin.lng}&destinations=${destinationsString}&key=${process.env.GOOGLE_API_KEY}`;
+      const response = await firstValueFrom(
+        this.httpService.get<DistanceMatrixData>(url),
+      );
+
+      const distanceMatrix = response.data.rows?.[0]?.elements;
+
+      if (!distanceMatrix || !distanceMatrix.length) {
+        throw new NotFoundException('Nenhuma distância encontrada.');
+      }
+
+      return distanceMatrix;
+    } catch (error) {
+      console.error(
+        'Erro no getDistanceMatrix:',
+        error?.response?.data || error,
+      );
       throw new InternalServerErrorException(
         'Erro ao consultar o Google Maps.',
       );
