@@ -10,4 +10,9 @@ export class StoresController {
   async findNearbyStores(@Param() params: CepValidationDto) {
     return await this.storesService.listNearbyStoresByCep(params.cep);
   }
+
+  @Get('listAll')
+  async listAll() {
+    return await this.storesService.listAllStores();
+  }
 }
