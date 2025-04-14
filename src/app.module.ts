@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { StoresModule } from './stores/stores.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WinstonModule } from 'nest-winston';
+import { logger } from './common/logger.config';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+    WinstonModule.forRoot(logger),
     StoresModule,
   ],
 })

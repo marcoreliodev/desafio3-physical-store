@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -12,10 +13,16 @@ import {
   TravelDistanceAndDuration,
   ViaCepData,
 } from '../types';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Injectable()
 export class GoogleMapsService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @Inject(WINSTON_MODULE_PROVIDER)
+    private readonly logger: Logger,
+  ) {}
 
   async geocodeCep(location: ViaCepData): Promise<Coordinates> {
     const { cep, localidade, uf } = location;
@@ -40,7 +47,7 @@ export class GoogleMapsService {
 
       return { lat: geo.lat, lng: geo.lng };
     } catch (error) {
-      console.error('Erro no geocodeCep:', error?.response?.data || error);
+      this.logger.error('Erro no geocodeCep:', error?.response?.data || error);
       throw new InternalServerErrorException(
         'Erro ao consultar o Google Maps.',
       );
@@ -69,7 +76,7 @@ export class GoogleMapsService {
 
       return distanceMatrix;
     } catch (error) {
-      console.error(
+      this.logger.error(
         'Erro no getDistanceMatrix:',
         error?.response?.data || error,
       );
