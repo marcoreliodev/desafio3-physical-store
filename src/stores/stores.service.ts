@@ -106,4 +106,18 @@ export class StoresService {
       statusCode: 200,
     };
   }
+
+  async getStoreById(storeID: string) {
+    const store = await this.storeModel
+      .findOne({ storeID })
+      .select('-_id -createdAt -updatedAt -__v -location');
+
+    if (!store) {
+      throw new NotFoundException(
+        `Loja com o storeID ${storeID} não foi encontrada.`,
+      );
+    }
+
+    return store;
+  }
 }
