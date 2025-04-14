@@ -16,4 +16,9 @@ export class StoresController {
   async listAll(@Query() paginationQuery: PaginationQueryDto) {
     return await this.storesService.listAllStores(paginationQuery);
   }
+
+  @Get('storebyid/:id')
+  async findStoreById(@Param('id') id: string) {
+    return await this.storesService.listStoreById(id);
+  }
 }
