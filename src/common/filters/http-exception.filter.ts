@@ -32,11 +32,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
       stack: exception instanceof Error ? exception.stack : undefined,
     };
 
-    logger.error(log);
+    if (status >= 500) {
+      logger.error(log);
+    }
 
-    response.status(status).json({
+    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      return response.status(status).json({
+        statusCode: status,
+        message: 'Ocorreu um erro interno',
+        path: request.url,
+      });
+    }
+    if (exception instanceof HttpException) {
+      return response.status(status).json(exception.getResponse());
+    }
+
+    return response.status(status).json({
       statusCode: status,
-      message: 'Ocorreu um erro interno',
+      message: String(message) || 'Erro desconhecido',
       path: request.url,
     });
   }
