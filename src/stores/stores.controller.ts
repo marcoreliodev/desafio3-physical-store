@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CepValidationDto } from './dtos/cep-validation.dto';
 import { StoresService } from './stores.service';
+import { PaginationQueryDto } from './dtos/pagination-query.dto';
 
 @Controller('stores')
 export class StoresController {
@@ -11,8 +12,8 @@ export class StoresController {
     return await this.storesService.listNearbyStoresByCep(params.cep);
   }
 
-  @Get('listAll')
-  async listAll() {
-    return await this.storesService.listAllStores();
+  @Get('listall')
+  async listAll(@Query() paginationQuery: PaginationQueryDto) {
+    return await this.storesService.listAllStores(paginationQuery);
   }
 }

@@ -4,6 +4,7 @@ import { GoogleMapsService } from 'src/services/google-maps.service';
 import { ViaCepService } from 'src/services/via-cep.service';
 import { Store, StoreDocument } from './schemas/store.schema';
 import { Model } from 'mongoose';
+import { PaginationQueryDto } from './dtos/pagination-query.dto';
 
 @Injectable()
 export class StoresService {
@@ -82,5 +83,27 @@ export class StoresService {
       distance: distanceMatrix[index].distance.text,
       duration: distanceMatrix[index].duration.text,
     }));
+  }
+
+  async listAllStores({ offset, limit }: PaginationQueryDto) {
+    const [stores, totalCount] = await Promise.all([
+      this.storeModel
+        .find()
+        .select('-_id -createdAt -updatedAt -__v -location')
+        .skip(offset)
+        .limit(limit)
+        .exec(),
+      this.storeModel.countDocuments(),
+    ]);
+
+    return {
+      stores,
+      limit,
+      offset,
+      total: totalCount,
+      currentPage: Math.floor(offset / limit) + 1,
+      totalPages: limit > 0 ? Math.ceil(totalCount / limit) : 0,
+      statusCode: 200,
+    };
   }
 }
