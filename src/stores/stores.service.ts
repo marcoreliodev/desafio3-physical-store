@@ -96,6 +96,10 @@ export class StoresService {
       this.storeModel.countDocuments(),
     ]);
 
+    if (!stores || stores.length === 0) {
+      throw new NotFoundException('Nenhuma loja encontrada.');
+    }
+
     return {
       stores,
       limit,
