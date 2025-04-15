@@ -120,4 +120,35 @@ export class StoresService {
 
     return store;
   }
+
+  async listStoresByState(
+    state: string,
+    { offset, limit }: PaginationQueryDto,
+  ) {
+    const [stores, totalCount] = await Promise.all([
+      this.storeModel
+        .find({ state })
+        .select('-_id -createdAt -updatedAt -__v -location')
+        .skip(offset)
+        .limit(limit)
+        .exec(),
+      this.storeModel.countDocuments({ state }),
+    ]);
+
+    if (!stores || stores.length === 0) {
+      throw new NotFoundException(
+        `Nenhuma loja encontrada no estado ${state}.`,
+      );
+    }
+
+    return {
+      stores,
+      limit,
+      offset,
+      total: totalCount,
+      currentPage: Math.floor(offset / limit) + 1,
+      totalPages: limit > 0 ? Math.ceil(totalCount / limit) : 0,
+      statusCode: 200,
+    };
+  }
 }

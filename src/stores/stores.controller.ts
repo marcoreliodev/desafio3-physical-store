@@ -23,7 +23,10 @@ export class StoresController {
   }
 
   @Get('storebystate/:state')
-  async findStoresByState(@Param('state') state: string) {
-    return await this.storesService.listStoresByState(state);
+  async findStoresByState(
+    @Param('state') state: string,
+    @Query() paginationQuery: PaginationQueryDto,
+  ) {
+    return await this.storesService.listStoresByState(state, paginationQuery);
   }
 }
