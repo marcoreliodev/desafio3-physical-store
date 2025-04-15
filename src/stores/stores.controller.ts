@@ -21,4 +21,9 @@ export class StoresController {
   async findStoreById(@Param('id') id: string) {
     return await this.storesService.getStoreById(id);
   }
+
+  @Get('storebystate/:state')
+  async findStoresByState(@Param('state') state: string) {
+    return await this.storesService.listStoresByState(state);
+  }
 }
