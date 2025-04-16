@@ -3,6 +3,7 @@ import { StoresController } from './stores.controller';
 import { StoresService } from './stores.service';
 import { ViaCepService } from 'src/services/via-cep.service';
 import { GoogleMapsService } from 'src/services/google-maps.service';
+import { MelhorEnvioService } from 'src/services/melhor-envio.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Store, StoreSchema } from './schemas/store.schema';
 import { HttpModule } from '@nestjs/axios';
@@ -13,6 +14,11 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
   ],
   controllers: [StoresController],
-  providers: [StoresService, ViaCepService, GoogleMapsService],
+  providers: [
+    StoresService,
+    ViaCepService,
+    GoogleMapsService,
+    MelhorEnvioService,
+  ],
 })
 export class StoresModule {}
