@@ -85,6 +85,11 @@ export class MelhorEnvioService {
         'Erro ao consultar a API do Melhor Envio.',
         error?.response?.data || error,
       );
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         'Erro ao consultar a Melhor Envio.',
       );

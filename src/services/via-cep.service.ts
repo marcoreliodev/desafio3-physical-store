@@ -38,6 +38,11 @@ export class ViaCepService {
         'Erro ao consultar o ViaCEP.',
         error?.response?.data || error,
       );
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException('Erro ao consultar o ViaCEP.');
     }
   }

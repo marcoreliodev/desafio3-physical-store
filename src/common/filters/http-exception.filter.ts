@@ -15,41 +15,48 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const isHttpException = exception instanceof HttpException;
+    const status = isHttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException ? exception.getResponse() : exception;
+    const message = isHttpException
+      ? exception.getResponse()
+      : 'Erro interno no servidor.';
+
+    const errorResponse =
+      typeof message === 'string'
+        ? { message }
+        : message && typeof message === 'object'
+          ? message
+          : { message: 'Erro desconhecido.' };
 
     const log = {
       timestamp: new Date().toISOString(),
-      path: request.url,
       method: request.method,
+      path: request.url,
       status,
-      message,
+      error: errorResponse,
       stack: exception instanceof Error ? exception.stack : undefined,
     };
 
     if (status >= 500) {
       logger.error(log);
+    } else {
+      logger.warn(log);
     }
 
-    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      return response.status(status).json({
-        statusCode: status,
+    if (!isHttpException || status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Ocorreu um erro interno',
         path: request.url,
       });
     }
-    if (exception instanceof HttpException) {
-      return response.status(status).json(exception.getResponse());
-    }
 
     return response.status(status).json({
+      ...errorResponse,
       statusCode: status,
-      message: String(message) || 'Erro desconhecido',
       path: request.url,
     });
   }

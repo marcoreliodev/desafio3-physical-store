@@ -80,6 +80,11 @@ export class GoogleMapsService {
         'Erro no getDistanceMatrix:',
         error?.response?.data || error,
       );
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         'Erro ao consultar o Google Maps.',
       );
