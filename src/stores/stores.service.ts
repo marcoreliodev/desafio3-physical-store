@@ -36,18 +36,19 @@ export class StoresService {
 
     const radiusInMeters = 100 * 1000; // 100km
 
-    const nearbyStores = await this.storeModel.find({
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [userCoordinates.lng, userCoordinates.lat],
+    const nearbyStores = await this.storeModel
+      .find({
+        location: {
+          $near: {
+            $geometry: {
+              type: 'Point',
+              coordinates: [userCoordinates.lng, userCoordinates.lat],
+            },
+            $maxDistance: radiusInMeters,
           },
-          $maxDistance: radiusInMeters,
         },
-      },
-    });
-
+      })
+      .select('-_id -createdAt -updatedAt -__v -location');
     if (nearbyStores.length === 0) {
       throw new NotFoundException('Nenhuma loja encontrada no raio de 100Km.');
     }
@@ -65,23 +66,7 @@ export class StoresService {
     );
 
     return nearbyStores.map((store, index) => ({
-      storeID: store.storeID,
-      storeName: store.storeName,
-      takeOutInStore: store.takeOutInStore,
-      shippingTimeInDays: store.shippingTimeInDays,
-      latitude: store.latitude,
-      longitude: store.longitude,
-      address1: store.address1,
-      address2: store.address2,
-      address3: store.address3,
-      city: store.city,
-      district: store.district,
-      state: store.state,
-      type: store.type,
-      country: store.country,
-      postalCode: store.postalCode,
-      telephoneNumber: store.telephoneNumber,
-      emailAddress: store.emailAddress,
+      ...store.toObject(),
       distance: distanceMatrix[index].distance.text,
       duration: distanceMatrix[index].duration.text,
     }));
