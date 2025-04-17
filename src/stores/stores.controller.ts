@@ -32,6 +32,6 @@ export class StoresController {
 
   @Get('storebycep/:cep')
   async findStoresByCep(@Param() params: CepValidationDto) {
-    return await this.storesService.listStoresByCep(params.cep);
+    return await this.storesService.listStoreByCep(params.cep);
   }
 }
