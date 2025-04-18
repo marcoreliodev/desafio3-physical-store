@@ -42,8 +42,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (status >= 500) {
       logger.error(log);
-    } else {
-      logger.warn(log);
     }
 
     if (!isHttpException || status === HttpStatus.INTERNAL_SERVER_ERROR) {
