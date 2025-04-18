@@ -225,9 +225,13 @@ export class StoresService {
             userLocation.cep,
           );
 
+    const { localidade = '', uf = '' } = userLocation || {};
+    const buyerAddress = [localidade, uf].join(', ');
+
     const storeWithDeliveryDetails = {
       ...storeDetails,
       distance: travelDistance,
+      deliveryAddress: buyerAddress,
       value,
     };
 
