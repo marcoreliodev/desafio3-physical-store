@@ -48,6 +48,11 @@ export class GoogleMapsService {
       return { lat: geo.lat, lng: geo.lng };
     } catch (error) {
       this.logger.error('Erro no geocodeCep:', error?.response?.data || error);
+
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException(
         'Erro ao consultar o Google Maps.',
       );
