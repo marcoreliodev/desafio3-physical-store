@@ -279,4 +279,33 @@ describe('StoresService', () => {
       );
     });
   });
+
+  describe('getStoreById', () => {
+    it('Should return a store by ID', async () => {
+      const storeID = 'store123';
+
+      jest.spyOn(storeModel, 'findOne').mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockStore),
+      } as any);
+
+      const result = await service.getStoreById(storeID);
+
+      expect(storeModel.findOne).toHaveBeenCalledWith({ storeID });
+      expect(result).toBe(mockStore);
+    });
+
+    it('Should throw NotFoundException when store not found', async () => {
+      const storeID = 'nonexistent';
+
+      jest.spyOn(storeModel, 'findOne').mockReturnValue({
+        select: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      await expect(service.getStoreById(storeID)).rejects.toThrow(
+        new NotFoundException(
+          `Loja com o storeID ${storeID} não foi encontrada.`,
+        ),
+      );
+    });
+  });
 });
