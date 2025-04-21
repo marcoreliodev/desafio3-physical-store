@@ -233,4 +233,50 @@ describe('StoresService', () => {
       );
     });
   });
+
+  describe('listAllStores', () => {
+    it('should return all stores with pagination', async () => {
+      const paginationDto = { offset: 0, limit: 10 };
+      const mockStores = [mockStore];
+      const totalCount = 1;
+
+      jest.spyOn(storeModel, 'find').mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockStores),
+      } as any);
+      jest.spyOn(storeModel, 'countDocuments').mockResolvedValue(totalCount);
+
+      const result = await service.listAllStores(paginationDto);
+
+      expect(storeModel.find).toHaveBeenCalled();
+      expect(storeModel.countDocuments).toHaveBeenCalled();
+      expect(result).toEqual({
+        stores: mockStores,
+        limit: paginationDto.limit,
+        offset: paginationDto.offset,
+        total: totalCount,
+        currentPage: 1,
+        totalPages: 1,
+        statusCode: 200,
+      });
+    });
+
+    it('should throw NotFoundException when no stores found', async () => {
+      const paginationDto = { offset: 0, limit: 10 };
+
+      jest.spyOn(storeModel, 'find').mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([]),
+      } as any);
+      jest.spyOn(storeModel, 'countDocuments').mockResolvedValue(0);
+
+      await expect(service.listAllStores(paginationDto)).rejects.toThrow(
+        new NotFoundException('Nenhuma loja encontrada.'),
+      );
+    });
+  });
 });
